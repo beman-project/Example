@@ -74,6 +74,19 @@ cmake -B /some/build/dir -S . -DCMAKE_CXX_FLAGS='-Werror=all -Wno-error=deprecat
 Otherwise follow the Basic Build workflow as described above.
 
 
+#### Building with vcpkg
+
+To build this project using vcpkg as the package provider, use the `vcpkg` CMake preset:
+
+```shell
+cmake --preset vcpkg
+cmake --build build
+ctest --test-dir build \
+  --output-junit build/xunit/results.xml
+DESTDIR=/some/staging/dir cmake --install /some/build/dir --component libexample-dev --prefix /opt/example
+```
+
+
 #### Sanitizers and Coverage Analysis
 
 To build this project with sanitizers enabled, simply use `CMAKE_CXX_FLAGS` [as documented in upstream CMake documentation](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_FLAGS.html). For instance, to enable an address sanitizer build:
