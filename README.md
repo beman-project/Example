@@ -1,32 +1,50 @@
 <!--
-Copyright © 2024 Bret Brown
 SPDX-License-Identifier: CC0-1.0
 -->
 
-# example
+# Beman.Example: A Beman Library Example
 
-## About
+![CI Tests](https://github.com/beman-project/Example/actions/workflows/ci_tests.yml/badge.svg)
 
-`example` is an example Beman library.
+`Beman.Example` is an example Beman library. `Beman.Example` is useful for nothing, though it might contain value as an experiment in modern and minimal C++ project structure. Please check [The Beman Standard](https://github.com/beman-project/beman/blob/main/docs/beman-standard.md).
 
-`example` is useful for nothing, though it might contain value as an experiment in modern and minimal C++ project structure.
+Implements: N/A for `Beman.Example`.
 
+## License
+
+Source and docs are licenced with CC0 1.0 Universal. Copy the contents and incorporate in your own work as you see fit.
+
+// SPDX-License-Identifier: CC0-1.0
 
 ## Building
 
 ### Dependencies
 
-This project is mainly tested on Ubuntu 22.04, but it should be as portable as CMake is.
+This project is mainly tested on Ubuntu `22.04` and `24.04`, but it should be as portable as CMake is.
 
-This project has zero C or C++ depenendencies.
+This project has no C or C++ dependencies.
 
-It does require two tools as build-time dependencies:
+Build-time dependencies:
 
--  `cmake`
+- `cmake`
 - `ninja`, `make`, or another CMake-supported build system
   - CMake defaults to "Unix Makefiles" on POSIX systems
 
+Example of installation on `Ubuntu 24.04`:
+
+```shell
+# Install tools:
+apt-get install -y cmake make ninja-build
+
+# Example of toolchains:
+apt-get install                           \
+  g++-14 gcc-14 gcc-13 g++-14             \
+  clang-18 clang++-18 clang-17 clang++-17
+```
+
 ### Instructions
+
+Full set of supported toolchains can be found in [.github/workflows/ci_test.yml](.github/workflows/ci_test.yml).
 
 #### Basic Build
 
@@ -37,8 +55,51 @@ cmake -B /some/build/dir -S .
 cmake --build /some/build/dir
 ctest --test-dir /some/build/dir \
   --output-junit build/xunit/results.xml
-DESTDIR=/some/staging/dir cmake --install /some/build/dir --component libexample-dev --prefix /opt/example
+DESTDIR=/some/staging/dir cmake --install /some/build/dir --component libbeman_example-dev --prefix /opt/example
 ```
+
+<details>
+<summary> Build example </summary>
+
+```shell
+# Configure example.
+$ cmake -B .build -S .
+-- The CXX compiler identification is GNU 13.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /path/to/repo/.build
+
+# Build example.
+$ cmake --build .build/
+[ 14%] Built target gtest
+[ 28%] Built target gmock
+[ 42%] Built target gmock_main
+[ 57%] Built target gtest_main
+[ 71%] Built target beman_example
+[ 78%] Building CXX object src/Beman/Example/tests/CMakeFiles/example_gtest.dir/example.t.cpp.o
+[ 85%] Linking CXX executable example_gtest
+[ 85%] Built target example_gtest
+[100%] Built target sample_usage
+
+# Run tests example.
+$ ctest --test-dir .build
+Internal ctest changing into directory: /path/to/repo/.build
+Test project /path/to/repo/.build
+    Start 1: ExampleTest.call_identity
+1/1 Test #1: ExampleTest.call_identity ........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+# Run examples.
+$ .build/examples/sample_usage 
+2024
+```
+</details>
 
 If all of those steps complete successfully, you should see the library installed in your staging directory.
 
@@ -61,6 +122,14 @@ You will see files like so:
             │       ├── example-noconfig.cmake
             │       └── example.cmake
             └── libexample.a
+```
+
+#### Disable Tests Build
+
+To build this project with skiped tests and its dependencies, simply use `BUILD_TESTING=OFF` [as documented in upstream CMake documentation](https://cmake.org/cmake/help/latest/module/CTest.html:
+
+```shell
+cmake -B /some/build/dir -S . -DBUILD_TESTING=OFF
 ```
 
 #### Manipulating Warnings
@@ -106,33 +175,32 @@ Otherwise follow the Basic Build workflow as described above.
 
 ### From C++
 
-If you *really* want to use `example` from your project (why???), you can include `example.hxx` from your C++ source files
+If you *really* want to use `Beman.Example` from your project (why???), you can include `Beman/Example/example.hpp` from your C++ source files
 
 ```cxx
-#include <example.hxx>
+#include <Beman/Example/example.hpp>
 ```
 
-`example` supports C++98, C++03, C++11, C++14, C++17, C++20, and C++23. It has no known issues with C++26 or C++29, though there are no compilation toolchains available to test against in those build modes.
+`Beman.Example` supports C++98, C++03, C++11, C++14, C++17, C++20, C+=23 and C++23. It has no known issues with C++29, though there are no compilation toolchains available to test against in those build modes.
 
-Note that `example` is incidentally compatible with most C dialects, but that behavior is not regularly tested and should be considered unsupported.
 
 ### From CMake
 
-For consumers using CMake, you will need to use the `example` CMake module to define the `example` CMake target:
+For consumers using CMake, you will need to use the `beman_example` CMake module to define the `beman_example` CMake target:
 
 ```cmake
-find_package(example REQUIRED)
+find_package(beman_example REQUIRED)
 ```
 
-You will also need to add `example::example` to the link libraries of any libraries or executables that include `example.hxx` in their source or header file.
+You will also need to add `beman::example` to the link libraries of any libraries or executables that include `example.hpp` in their source or header file.
 
 ```cmake
-target_link_libraries(yourlib PUBLIC example::example)
+target_link_libraries(yourlib PUBLIC beman::example)
 ```
 
 ### From Other Build Systems
 
-Build systems that support `pkg-config` by providing a `example.pc` file. Build systems that support interoperation via `pkg-config` should be able to detect `example` for you automatically.
+Build systems that support `pkg-config` by providing a `beman_example.pc` file. Build systems that support interoperation via `pkg-config` should be able to detect `beman_example` for you automatically.
 
 ## Contributing
 
