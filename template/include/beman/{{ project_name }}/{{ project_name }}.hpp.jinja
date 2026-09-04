@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+{% set identity = "identity" if generating_exemplar else "todo" %}
+
+#ifndef BEMAN_{{project_name.upper()}}_{{project_name.upper()}}_HPP
+#define BEMAN_{{project_name.upper()}}_{{project_name.upper()}}_HPP
+
+#include <beman/{{project_name}}/config.hpp>
+
+#if BEMAN_{{project_name.upper()}}_USE_MODULES() && !defined(BEMAN_{{project_name.upper()}}_INCLUDED_FROM_INTERFACE_UNIT)
+
+import beman.{{project_name}};
+
+#else
+
+    #include <beman/{{project_name}}/{{identity}}.hpp>
+
+#endif // BEMAN_{{project_name.upper()}}_USE_MODULES() &&
+       // !defined(BEMAN_{{project_name.upper()}}_INCLUDED_FROM_INTERFACE_UNIT)
+
+#endif // BEMAN_{{project_name.upper()}}_{{project_name.upper()}}_HPP

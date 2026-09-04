@@ -1,0 +1,11 @@
+export module beman.{{project_name}};
+
+import std;
+
+#define BEMAN_{{project_name.upper()}}_INCLUDED_FROM_INTERFACE_UNIT
+export {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
+#include <beman/{{project_name}}/{{project_name}}.hpp>
+#pragma clang diagnostic pop
+}

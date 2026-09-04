@@ -1,0 +1,108 @@
+_min_copier_version: "9.14.3"
+_subdirectory: template
+_templates_suffix: .jinja
+_envops:
+  trim_blocks: true
+
+template_src_path:
+  type: str
+  when: false
+  default: "{{ _copier_conf.src_path }}"
+
+template_commit:
+  type: str
+  when: false
+  default: "{{ _copier_conf.vcs_ref_hash }}"
+
+project_name:
+  type: str
+  help: Name of the generated repository and library.
+  default: my_project_name
+  validator: >-
+    {% if not (project_name | regex_search('^[a-z][a-z0-9_]*$')) %}
+    Use lowercase letters, digits, or underscores, and start with a letter.
+    {% endif %}
+
+maintainer:
+  type: str
+  help: GitHub username of the project maintainer.
+  default: your_github_username
+
+minimum_cpp_build_version:
+  type: str
+  help: Minimum C++ language version to require when building.
+  default: "20"
+  validator: >-
+    {% if minimum_cpp_build_version not in ['17', '20', '23', '26'] %}
+    Choose one of: 17, 20, 23, 26.
+    {% endif %}
+
+paper:
+  type: str
+  help: WG21 paper number associated with the library.
+  default: PnnnnRr
+
+description:
+  type: str
+  help: Short project description.
+  default: Short project description.
+
+unit_test_library:
+  type: str
+  help: Unit test library to configure.
+  choices:
+    - gtest
+    - catch2
+  default: gtest
+
+generating_exemplar:
+  type: bool
+  when: false
+  default: "{{ generating_exemplar | default(false) }}"
+
+owner:
+  type: str
+  when: false
+  default: "{{ owner | default('bemanproject') }}"
+
+ci_tests_cron:
+  type: str
+  when: false
+  # If a cron was already saved in .copier-answers.yml, reuse it to prevent
+  # merge conflicts on update. Otherwise, generate a random one to spread
+  # CI load across all Beman projects.
+  default: >-
+    {%- if ci_tests_cron is defined and ci_tests_cron != "" -%}
+      {{ ci_tests_cron }}
+    {%- else -%}
+      {{ range(0, 59)|random }} {{ range(0, 23)|random }} * * {{ range(0, 6)|random }}
+    {%- endif -%}
+
+pre_commit_update_cron:
+  type: str
+  when: false
+  # Same logic as above: reuse existing or generate random.
+  default: >-
+    {%- if pre_commit_update_cron is defined and pre_commit_update_cron != "" -%}
+      {{ pre_commit_update_cron }}
+    {%- else -%}
+      {{ range(0, 59)|random }} {{ range(0, 23)|random }} * * {{ range(0, 6)|random }}
+    {%- endif -%}
+
+_tasks:
+  - >-
+    if [ "{{ generating_exemplar }}" != "True" ] && [ "{{ generating_exemplar }}" != "true" ]; then
+      mv "include/beman/{{ project_name }}/identity.hpp" "include/beman/{{ project_name }}/todo.hpp";
+      mv "examples/identity_direct_usage.cpp" "examples/todo.cpp";
+      rm "examples/identity_as_default_projection.cpp";
+      mv "tests/beman/{{ project_name }}/identity.test.cpp" "tests/beman/{{ project_name }}/todo.test.cpp";
+      echo "{{ _copier_conf.vcs_ref_hash }}" > .exemplar_version;
+    fi
+  # Reformat the generated tree with the project's own formatters (gersemi,
+  # clang-format) so it is lint-clean on the first pre-commit / CI run. This
+  # is a no-op for the already-formatted exemplar, preserving copier/exemplar
+  # consistency (see copier/check_copier.sh).
+  - bash "{{ _copier_conf.src_path }}/copier/format_project.sh"
+  # After reformatting to account for project and file name substitutions commit initial project
+  - "[ -d .git ] || git init"
+  - "git add . && git commit --allow-empty -m 'Initial copier generation' || true"

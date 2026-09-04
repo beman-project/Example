@@ -1,6 +1,8 @@
 infra/** linguist-vendored
+{% if generating_exemplar -%}
 template/** linguist-vendored
 copier/** linguist-vendored
+{% endif -%}
 *.bib -linguist-detectable
 *.tex -linguist-detectable
 papers/* linguist-documentation

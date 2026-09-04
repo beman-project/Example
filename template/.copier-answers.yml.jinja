@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Standard answers and internal state managed by Copier
+{{ _copier_answers | to_nice_yaml -}}
+
+# Hidden variables manually tracked because 'when: false' omits them from _copier_answers
+generating_exemplar: {{ generating_exemplar | to_json }}
+owner: {{ owner | to_json }}
+ci_tests_cron: {{ ci_tests_cron | to_json }}
+pre_commit_update_cron: {{ pre_commit_update_cron | to_json }}

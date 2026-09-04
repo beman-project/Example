@@ -9,16 +9,18 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: '30 15 * * 6'
+    - cron: '{{ ci_tests_cron }}'
 
 concurrency:
-  group: ${{format('{0}:{1}', github.repository, github.ref)}}
+  group: {% raw %}${{format('{0}:{1}', github.repository, github.ref)}}{% endraw %}
+
   cancel-in-progress: true
 
 jobs:
   beman-submodule-check:
     uses: bemanproject/infra-workflows/.github/workflows/reusable-beman-submodule-check.yml@1.7.4
 
+{% if generating_exemplar %}
   copier-test:
     runs-on: ubuntu-latest
     container:
@@ -73,7 +75,9 @@ jobs:
         env:
           GITHUB_ACTIONS: true
         # Run across our experimental boundaries
-        run: ./copier/test_cmake_matrix.sh gcc-release ${{ matrix.cmake_version }}
+        run: ./copier/test_cmake_matrix.sh gcc-release {% raw %}${{ matrix.cmake_version }}{% endraw %}
+
+{% endif %}
   preset-test:
     uses: bemanproject/infra-workflows/.github/workflows/reusable-beman-preset-test.yml@1.7.4
     with:
@@ -103,7 +107,7 @@ jobs:
                       "tests": [
                         "Debug.Default", "Release.Default", "Release.TSan",
                         "Release.MaxSan", "Debug.Werror",
-                        "Debug.Coverage", "Debug.-DBEMAN_EXEMPLAR_USE_MODULES=On"
+                        "Debug.Coverage", "Debug.-DBEMAN_{{project_name.upper()}}_USE_MODULES=On"
                       ]
                     }
                   ]
@@ -112,7 +116,7 @@ jobs:
                   "tests": [
                     { "stdlibs": ["libstdc++"],
                       "tests": [
-                        "Release.Default", "Debug.-DBEMAN_EXEMPLAR_USE_MODULES=On"
+                        "Release.Default", "Debug.-DBEMAN_{{project_name.upper()}}_USE_MODULES=On"
                       ]
                     }
                   ]
@@ -128,7 +132,7 @@ jobs:
                   "tests": [
                     { "stdlibs": ["libstdc++"],
                       "tests": [
-                        "Release.Default", "Debug.-DBEMAN_EXEMPLAR_USE_MODULES=On"
+                        "Release.Default", "Debug.-DBEMAN_{{project_name.upper()}}_USE_MODULES=On"
                       ]
                     }
                   ]
@@ -163,7 +167,7 @@ jobs:
                       "tests": [
                         "Debug.Default", "Release.Default", "Release.TSan",
                         "Release.MaxSan", "Debug.Werror",
-                        "Debug.-DBEMAN_EXEMPLAR_USE_MODULES=On"
+                        "Debug.-DBEMAN_{{project_name.upper()}}_USE_MODULES=On"
                       ]
                     }
                   ]
@@ -172,7 +176,7 @@ jobs:
                   "tests": [
                     { "stdlibs": ["libstdc++", "libc++"],
                       "tests": [
-                        "Release.Default", "Debug.-DBEMAN_EXEMPLAR_USE_MODULES=On"
+                        "Release.Default", "Debug.-DBEMAN_{{project_name.upper()}}_USE_MODULES=On"
                       ]
                     }
                   ]
@@ -231,7 +235,7 @@ jobs:
                     { "stdlibs": ["stl"],
                       "tests": [
                         "Debug.Default", "Release.Default", "Release.MaxSan",
-                        "Debug.-DBEMAN_EXEMPLAR_USE_MODULES=On"
+                        "Debug.-DBEMAN_{{project_name.upper()}}_USE_MODULES=On"
                       ]
                     }
                   ]
@@ -244,7 +248,7 @@ jobs:
   vcpkg-ci:
     uses: bemanproject/infra-workflows/.github/workflows/reusable-beman-vcpkg-ci.yml@1.7.4
     with:
-      port_name: beman-exemplar
+      port_name: beman-{{project_name.replace('_', '-')}}
       feature_combinations: |
         [
           {"features": {}},

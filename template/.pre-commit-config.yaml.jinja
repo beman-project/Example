@@ -40,4 +40,16 @@ repos:
     hooks:
       - id: codespell
 
+{% if not generating_exemplar %}
+    # Beman Standard checking via beman-tidy
+  - repo: https://github.com/bemanproject/beman-tidy
+    rev: v0.5.4
+    hooks:
+    - id: beman-tidy
+
+{% endif %}
+{% if generating_exemplar -%}
 exclude: 'template/|copier/|infra/|port/'
+{% else -%}
+exclude: 'infra/|port/'
+{% endif -%}

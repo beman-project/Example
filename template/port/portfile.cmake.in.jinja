@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO bemanproject/exemplar
+    REPO bemanproject/{{project_name}}
     REF "v@VERSION@"
     SHA512 @SHA512@
     HEAD_REF main
@@ -10,22 +10,22 @@ vcpkg_from_github(
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
-        modules   BEMAN_EXEMPLAR_USE_MODULES
+        modules   BEMAN_{{project_name.upper()}}_USE_MODULES
 )
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         ${FEATURE_OPTIONS}
-        -DBEMAN_EXEMPLAR_BUILD_TESTS=OFF
-        -DBEMAN_EXEMPLAR_BUILD_EXAMPLES=OFF
+        -DBEMAN_{{project_name.upper()}}_BUILD_TESTS=OFF
+        -DBEMAN_{{project_name.upper()}}_BUILD_EXAMPLES=OFF
 )
 
 vcpkg_cmake_install()
 
 vcpkg_cmake_config_fixup(
-    PACKAGE_NAME beman.exemplar
-    CONFIG_PATH lib/cmake/beman.exemplar
+    PACKAGE_NAME beman.{{project_name}}
+    CONFIG_PATH lib/cmake/beman.{{project_name}}
 )
 
 if(NOT "modules" IN_LIST FEATURES)

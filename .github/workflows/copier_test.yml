@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+name: Copier Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  copier-test:
+    runs-on: ubuntu-latest
+    name: "Check copier for consistency"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: beman copier consistency check
+        run: |
+          ./copier/check_copier.sh

@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+{% set identity = "identity" if generating_exemplar else "todo" %}
+
+{% if unit_test_library == "gtest" %}
+find_package(GTest REQUIRED)
+{% elif unit_test_library == "catch2" %}
+find_package(Catch2 3 REQUIRED)
+{% endif %}
+
+add_executable(beman.{{project_name}}.tests.{{identity}})
+target_sources(beman.{{project_name}}.tests.{{identity}} PRIVATE {{identity}}.test.cpp)
+target_link_libraries(
+    beman.{{project_name}}.tests.{{identity}}
+{% if unit_test_library == "gtest" %}
+    PRIVATE beman::{{project_name}} GTest::gtest_main
+{% elif unit_test_library == "catch2" %}
+    PRIVATE beman::{{project_name}} Catch2::Catch2WithMain
+{% endif %}
+)
+if(BEMAN_{{project_name.upper()}}_USE_MODULES)
+    set_target_properties(
+        beman.{{project_name}}.tests.{{identity}}
+        PROPERTIES CXX_MODULE_STD ON
+    )
+endif()
+
+{% if unit_test_library == "gtest" %}
+include(GoogleTest)
+gtest_discover_tests(beman.{{project_name}}.tests.{{identity}} DISCOVERY_TIMEOUT 60)
+{% elif unit_test_library == "catch2" %}
+include(Catch)
+catch_discover_tests(beman.{{project_name}}.tests.{{identity}})
+{% endif %}

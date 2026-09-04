@@ -1,0 +1,117 @@
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+{% set identity = "identity" if generating_exemplar else "todo" %}
+
+#include <beman/{{project_name}}/config.hpp>
+{% if unit_test_library == "gtest" %}
+#include <gtest/gtest.h>
+{% elif unit_test_library == "catch2" %}
+#include <catch2/catch_all.hpp>
+{% endif %}
+#include <beman/{{project_name}}/{{identity}}.hpp>
+
+{% if generating_exemplar %}
+#if BEMAN_EXEMPLAR_USE_MODULES()
+import std;
+#else
+    #include <algorithm>
+    #include <functional>
+#endif
+
+namespace exe = beman::{{project_name}};
+
+{% if unit_test_library == "gtest" %}
+TEST(IdentityTest, call_identity_with_int) {
+{% elif unit_test_library == "catch2" %}
+TEST_CASE("can call identity with int", "[{{project_name}}::call_identity_with_int]") {
+{% endif %}
+    for (int i = -100; i < 100; ++i) {
+{% if unit_test_library == "gtest" %}
+        EXPECT_EQ(i, exe::identity()(i));
+{% elif unit_test_library == "catch2" %}
+        CHECK(i == exe::identity()(i));
+{% endif %}
+    }
+}
+
+{% if unit_test_library == "gtest" %}
+TEST(IdentityTest, call_identity_with_custom_type) {
+{% elif unit_test_library == "catch2" %}
+TEST_CASE("can call identity with custom type", "[{{project_name}}::call_identity_with_custom_type]") {
+{% endif %}
+    struct S {
+        int i;
+    };
+
+    for (int i = -100; i < 100; ++i) {
+        const S s{i};
+        const S s_id = exe::identity()(s);
+{% if unit_test_library == "gtest" %}
+        EXPECT_EQ(s.i, s_id.i);
+{% elif unit_test_library == "catch2" %}
+        CHECK(s.i == s_id.i);
+{% endif %}
+    }
+}
+
+{% if unit_test_library == "gtest" %}
+TEST(IdentityTest, compare_std_vs_beman) {
+{% elif unit_test_library == "catch2" %}
+TEST_CASE("compare std vs beman", "[{{project_name}}::compare_std_vs_beman]") {
+{% endif %}
+// Requires: std::identity support.
+#if defined(__cpp_lib_type_identity)
+    std::identity std_id;
+    exe::identity beman_id;
+    for (int i = -100; i < 100; ++i) {
+{% if unit_test_library == "gtest" %}
+        EXPECT_EQ(std_id(i), beman_id(i));
+{% elif unit_test_library == "catch2" %}
+        CHECK(std_id(i) == beman_id(i));
+{% endif %}
+    }
+#endif
+}
+
+{% if unit_test_library == "gtest" %}
+TEST(IdentityTest, check_is_transparent) {
+{% elif unit_test_library == "catch2" %}
+TEST_CASE("check is transparent", "[{{project_name}}::check_is_transparent]") {
+{% endif %}
+// Requires: transparent operators support.
+#if defined(__cpp_lib_transparent_operators)
+
+    exe::identity id;
+
+    const auto container = {1, 2, 3, 4, 5};
+    auto       it        = std::find(std::begin(container), std::end(container), 3);
+{% if unit_test_library == "gtest" %}
+    EXPECT_EQ(3, *it);
+{% elif unit_test_library == "catch2" %}
+    CHECK(3 == *it);
+{% endif %}
+    auto it_with_id = std::find(std::begin(container), std::end(container), id(3));
+{% if unit_test_library == "gtest" %}
+    EXPECT_EQ(3, *it_with_id);
+
+    EXPECT_EQ(it, it_with_id);
+{% elif unit_test_library == "catch2" %}
+    CHECK(3 == *it_with_id);
+
+    CHECK(it == it_with_id);
+{% endif %}
+#endif
+}
+{% else %}
+{% if unit_test_library == "gtest" %}
+TEST(TodoTest, todo) {
+{% elif unit_test_library == "catch2" %}
+TEST_CASE("todo", "[{{project_name}}::todo]") {
+{% endif %}
+    const bool todo = true;
+{% if unit_test_library == "gtest" %}
+    EXPECT_TRUE(todo);
+{% elif unit_test_library == "catch2" %}
+    CHECK(todo);
+{% endif %}
+}
+{% endif %}

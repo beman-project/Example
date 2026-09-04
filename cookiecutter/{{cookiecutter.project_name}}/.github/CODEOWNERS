@@ -1,7 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-
-{% if cookiecutter._generating_exemplar %}
-*  @ednolan @bretbrownjr @camio @dietmarkuehl @steve-downey @wusatosi
-{% else %}
-*  @{{ cookiecutter.maintainer }}
-{% endif %}

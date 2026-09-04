@@ -1,0 +1,23 @@
+{
+  "name": "beman-{{project_name.replace('_', '-')}}",
+{% if generating_exemplar %}
+  "version-semver": "2.4.1",
+{% else %}
+  "version-semver": "0.1.0",
+{% endif %}
+{% if unit_test_library == "gtest" %}
+  "dependencies": [
+    {
+      "name": "gtest",
+      "host": true
+    }
+  ]
+{% elif unit_test_library == "catch2" %}
+  "dependencies": [
+    {
+      "name": "catch2",
+      "host": true
+    }
+  ]
+{% endif %}
+}
