@@ -14,14 +14,14 @@ repos:
     # This brings in a portable version of clang-format.
     # See also: https://github.com/ssciwr/clang-format-wheel
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.8
+    rev: v23.1.1
     hooks:
     - id: clang-format
       types_or: [c++, c]
 
     # CMake linting and formatting
   - repo: https://github.com/BlankSpruce/gersemi-pre-commit
-    rev: 0.28.0
+    rev: 0.28.1
     hooks:
     - id: gersemi
       name: CMake linting
@@ -40,12 +40,4 @@ repos:
     hooks:
       - id: codespell
 
-{% if not cookiecutter._generating_exemplar %}
-    # Beman Standard checking via beman-tidy
-  - repo: https://github.com/bemanproject/beman-tidy
-    rev: v0.5.4
-    hooks:
-    - id: beman-tidy
-
-{% endif %}
 exclude: 'cookiecutter/|infra/|port/'
